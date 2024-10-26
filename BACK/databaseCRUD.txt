@@ -1,0 +1,270 @@
+create database CRUD;
+\c CRUD;
+
+!----------------------Familia
+
+CREATE TABLE familia (
+    id CHAR(3) NOT NULL,
+    id_clase CHAR(2) NOT NULL,
+    iD_departamento CHAR(1) NOT NULL,
+    nombre TEXT NOT NULL,
+    PRIMARY KEY (id, id_clase, iD_departamento),
+    FOREIGN KEY (id_clase, iD_departamento) REFERENCES clase (id, iD_departamento)
+);
+
+INSERT INTO familia (id, id_clase, iD_departamento, nombre) VALUES 
+    ('000', '01', '1', 'SIN NOMBRE'),
+    ('001', '02', '1', 'LICUADORAS'),
+    ('002', '02', '1', 'EXCLUSIVO COPPEL.COM'),
+    ('001', '03', '1', 'BATIDORA MANUAL'),
+    ('002', '03', '1', 'PROCESADOR'),
+    ('003', '03', '1', 'PICADORA'),
+    ('004', '03', '1', 'BATIDORA PEDESTAL'),
+    ('005', '03', '1', 'BATIDORA FUENTE DE SODAS'),
+    ('006', '03', '1', 'MULTIPRACTICOS'),
+    ('007', '03', '1', 'EXCLUSIVOS COPPEL.COM'),
+    ('001', '04', '1', 'CAFETERAS'),
+    ('002', '04', '1', 'PERCOLADORAS'),
+    ('001', '01', '2', 'AMPLIFICADOR/RECEPTOR'),
+    ('002', '01', '2', 'KIT DE INSTALACION'),
+    ('003', '01', '2', 'AMPLIFICADORES COPPEL'),
+    ('001', '02', '2', 'AUTOESTEREO CD C/BOOMBOX'),
+    ('002', '02', '2', 'ACCESORIOS CAR AUDIO'),
+    ('003', '02', '2', 'AMPLIFICADOR'),
+    ('004', '02', '2', 'ALARMA AUTO/CASA/OFICINA'),
+    ('005', '02', '2', 'SIN MECANISMO'),
+    ('006', '02', '2', 'CON CD'),
+    ('007', '02', '2', 'MULTIMEDIA'),
+    ('008', '02', '2', 'PAQUETE SIN MECANISMO'),
+    ('009', '02', '2', 'PAQUETE CON CD'),
+    ('001', '01', '3', 'PILLOW TOP KS'),
+    ('002', '01', '3', 'PILLOW TOP DOBLE KS'),
+    ('003', '01', '3', 'HULE ESPUMA KS'),
+    ('001', '02', '3', 'ESTANDAR INDIVIDUAL'),
+    ('002', '02', '3', 'PILLOW TOP INDIVIDUAL'),
+    ('003', '02', '3', 'PILLOW TOP DOBLE INDIVIDUAL'),
+    ('001', '01', '4', 'ESQUINERAS SUPERIORES'),
+    ('002', '01', '4', 'TIPO L SECCIONAL'),
+    ('001', '02', '4', 'SILLON OCASIONAL'),
+    ('002', '02', '4', 'PUFF'),
+    ('003', '02', '4', 'BAUL'),
+    ('004', '02', '4', 'TABURETE'),
+    ('001', '03', '4', 'SOFA CAMA TAPIZADO'),
+    ('002', '03', '4', 'SOFA CAMA CLASICO'),
+    ('003', '03', '4', 'ESTUDIO');
+
+CREATE OR REPLACE FUNCTION buscar_familia_por_departamento(p_id_departamento CHAR(1))
+RETURNS TABLE (
+    id CHAR(3),
+    id_clase CHAR(2),
+    iD_departamento CHAR(1),
+    nombre TEXT
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        f.id,
+        f.id_clase,
+        f.iD_departamento,
+        f.nombre
+    FROM familia AS f
+    WHERE f.iD_departamento = p_id_departamento;
+END;
+$$ LANGUAGE plpgsql;
+
+
+!----------------------Clases
+
+CREATE TABLE clase (
+    id CHAR(2) NOT NULL,
+    iD_departamento CHAR(1) NOT NULL,
+    nombre TEXT NOT NULL,
+    PRIMARY KEY (id, iD_departamento),
+    FOREIGN KEY (iD_departamento) REFERENCES departamento(id)
+);
+
+INSERT INTO clase (id, iD_departamento, nombre) VALUES 
+    ('01', 1, 'COMESTIBLES'),
+    ('02', 1, 'LICUADORAS'),
+    ('03', 1, 'BATIDORAS'),
+    ('04', 1, 'CAFETERAS'),
+    ('01', 2, 'AMPLIFICADORES DE AUDIO'),
+    ('02', 2, 'AUTO STEREOS'),
+    ('01', 3, 'COLCHON'),
+    ('02', 3, 'JUEGO BOX'),
+    ('01', 4, 'SALAS'),
+    ('02', 4, 'COMPLEMENTOS PARA SALA'),
+    ('03', 4, 'SOFAS CAMA');
+
+CREATE OR REPLACE FUNCTION buscar_clase_por_departamento(p_id_departamento CHAR(1))
+RETURNS TABLE (
+    id CHAR(2),
+    iD_departamento CHAR(1),
+    nombre TEXT
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        c.id,
+        c.iD_departamento,
+        c.nombre
+    FROM clase AS c
+    WHERE c.iD_departamento = p_id_departamento;
+END;
+$$ LANGUAGE plpgsql;
+
+
+!----------------------Departamento
+
+create table departamento ( 
+	id char(1) PRIMARY KEY NOT NULL, 
+	nombre text NOT NULL
+);
+
+insert into departamento (id, nombre) values ('1', 'DOMESTICOS');
+insert into departamento (id, nombre) values ('2', 'ELECTRONICO');
+insert into departamento (id, nombre) values ('3', 'MUEBLE SUELTO');
+insert into departamento (id, nombre) values ('4', 'SALAS, RECAMARAS, COMEDORES');
+
+CREATE OR REPLACE FUNCTION buscar_departamento(p_id CHAR(1))
+RETURNS TABLE (
+    id CHAR(1),
+    nombre TEXT
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        d.id,
+        d.nombre
+    FROM departamento AS d
+    WHERE d.id = p_id;
+END;
+$$ LANGUAGE plpgsql;
+
+
+!--------------------------Articulos
+
+create table articulo (
+	Sku int PRIMARY KEY NOT NULL,
+	Articulo varchar(15) NOT NULL,
+	Marcha varchar(15) NOT NULL,
+	Modelo varchar(20) NOT NULL,
+	Departamento varchar(1) NOT NULL,
+	Clase varchar(2) NOT NULL,
+	Familia varchar(3) NOT NULL,
+	FechaAlta date NOT NULL,
+	Stock int NOT NULL,
+	Cantidad int NOT NULL,
+	Descontinuado int NOT NULL,
+	FechaBaja date NOT NULL,
+	foreign key (Departamento) references departamento (id),
+	foreign key (Departamento, Clase) references clase (iD_departamento, id),
+	foreign key (Departamento. Clase, Familia) references familia (iD_departamento, id_clase, id)
+);
+
+--funciones
+CREATE OR REPLACE FUNCTION consultar_articulo_por_sku(p_sku INT)
+RETURNS TABLE (
+    Sku INT,
+    Articulo VARCHAR(15),
+    Marcha VARCHAR(15),
+    Modelo VARCHAR(20),
+    Departamento VARCHAR(1),
+    Clase VARCHAR(2),
+    Familia VARCHAR(3),
+    FechaAlta DATE,
+    Stock INT,
+    Cantidad INT,
+    Descontinuado INT,
+    FechaBaja DATE
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        Sku,
+        Articulo,
+        Marcha,
+        Modelo,
+        Departamento,
+        Clase,
+        Familia,
+        FechaAlta,
+        Stock,
+        Cantidad,
+        Descontinuado,
+        FechaBaja
+    FROM articulo
+    WHERE Sku = p_sku;
+END;
+$$ LANGUAGE plpgsql;
+
+--procedimientos
+CREATE OR REPLACE PROCEDURE crear_articulo(
+    p_sku INT,
+    p_articulo VARCHAR(15),
+    p_marcha VARCHAR(15),
+    p_modelo VARCHAR(20),
+    p_departamento VARCHAR(1),
+    p_clase VARCHAR(2),
+    p_familia VARCHAR(3),
+    p_fecha_alta DATE,
+    p_stock INT,
+    p_cantidad INT,
+    p_descontinuado INT,
+    p_fecha_baja DATE
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    INSERT INTO articulo (
+        Sku, Articulo, Marcha, Modelo, Departamento, Clase, Familia, FechaAlta, Stock, Cantidad, Descontinuado, FechaBaja
+    ) VALUES (
+        p_sku, p_articulo, p_marcha, p_modelo, p_departamento, p_clase, p_familia, p_fecha_alta, p_stock, p_cantidad, p_descontinuado, p_fecha_baja
+    );
+END;
+$$;
+
+
+CREATE OR REPLACE PROCEDURE actualizar_articulo(
+    p_sku INT,
+    p_articulo VARCHAR(15),
+    p_marcha VARCHAR(15),
+    p_modelo VARCHAR(20),
+    p_departamento VARCHAR(1),
+    p_clase VARCHAR(2),
+    p_familia VARCHAR(3),
+    p_fecha_alta DATE,
+    p_stock INT,
+    p_cantidad INT,
+    p_descontinuado INT,
+    p_fecha_baja DATE
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    UPDATE articulo
+    SET
+        Articulo = p_articulo,
+        Marcha = p_marcha,
+        Modelo = p_modelo,
+        Departamento = p_departamento,
+        Clase = p_clase,
+        Familia = p_familia,
+        FechaAlta = p_fecha_alta,
+        Stock = p_stock,
+        Cantidad = p_cantidad,
+        Descontinuado = p_descontinuado,
+        FechaBaja = p_fecha_baja
+    WHERE Sku = p_sku;
+END;
+$$;
+
+CREATE OR REPLACE PROCEDURE borrar_articulo(p_sku INT)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    DELETE FROM articulo
+    WHERE Sku = p_sku;
+END;
+$$;
+
