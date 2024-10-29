@@ -1,0 +1,37 @@
+body {
+  background-color: white;
+}
+
+div {
+  background-color: #f7f7f7;
+  margin-top: 25px  ;
+}
+
+
+.linea {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+}
+
+.linea-botones{
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+  text-align: right;
+  margin-left: 60px;
+  margin-right: 0px;
+}
+
+.linea-check{
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  float: right;
+  gap: 10px;
+  margin-left: 400px;
+  margin-top: 0px;
+  text-align: right;
+}
