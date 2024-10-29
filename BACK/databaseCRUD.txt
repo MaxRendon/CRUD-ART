@@ -1,6 +1,21 @@
 create database CRUD;
 \c CRUD;
 
+vista_departamento_clase_familia AS
+SELECT 
+    departamento.id AS departamento_id,
+    departamento.nombre AS departamento_nombre,
+    clase.id AS clase_id,
+    clase.nombre AS clase_nombre,
+    familia.id AS familia_id,
+    familia.nombre AS familia_nombre
+FROM 
+    departamento
+JOIN 
+    clase ON departamento.id = clase.iD_departamento
+JOIN 
+    familia ON clase.id = familia.id_clase AND clase.iD_departamento = familia.iD_departamento;
+
 !----------------------Familia
 
 CREATE TABLE familia (
@@ -53,7 +68,7 @@ INSERT INTO familia (id, id_clase, iD_departamento, nombre) VALUES
     ('002', '03', '4', 'SOFA CAMA CLASICO'),
     ('003', '03', '4', 'ESTUDIO');
 
-CREATE OR REPLACE FUNCTION buscar_familia_por_departamento(p_id_departamento CHAR(1))
+CREATE OR REPLACE FUNCTION buscar_familia_por_clase(p_id_clase CHAR(2))
 RETURNS TABLE (
     id CHAR(3),
     id_clase CHAR(2),
@@ -68,7 +83,7 @@ BEGIN
         f.iD_departamento,
         f.nombre
     FROM familia AS f
-    WHERE f.iD_departamento = p_id_departamento;
+    WHERE f.iD_clase = p_id_clase;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -126,20 +141,18 @@ insert into departamento (id, nombre) values ('2', 'ELECTRONICO');
 insert into departamento (id, nombre) values ('3', 'MUEBLE SUELTO');
 insert into departamento (id, nombre) values ('4', 'SALAS, RECAMARAS, COMEDORES');
 
-CREATE OR REPLACE FUNCTION buscar_departamento(p_id CHAR(1))
+CREATE OR REPLACE FUNCTION buscar_departamento()
 RETURNS TABLE (
-    id CHAR(1),
-    nombre TEXT
+    id CHAR(1)
 ) AS $$
 BEGIN
     RETURN QUERY
     SELECT
-        d.id,
-        d.nombre
-    FROM departamento AS d
-    WHERE d.id = p_id;
+        d.id
+    FROM departamento AS d;
 END;
 $$ LANGUAGE plpgsql;
+
 
 
 !--------------------------Articulos

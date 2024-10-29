@@ -1,9 +1,11 @@
 const express = require('express');
 const { Client } = require('pg');
+const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 const PORT = process.env.PORT || 3000;
 
 const client = new Client({
@@ -27,28 +29,44 @@ app.get('/api/familia', async (req, res) => {
     }
 });
 
+//---------------------------------------------------------Vista para el csv
+const fs = require('fs');
+const fastcsv = require('fast-csv');
 
-//------------------------Departamento
-app.get('/api/departamento/:id', async (req, res) => {
-    const id = req.params.id; 
-
+app.get('/api/exportar-vista', async (req, res) => {
     try {
-        const result = await client.query(
-            'SELECT * FROM buscar_departamento($1)',
-            [id]
-        );
+        const result = await client.query('SELECT * FROM vista_departamento_clase_familia');
+        res.setHeader('Content-Disposition', 'attachment; filename="vista_departamento_clase_familia.csv"');
+        res.setHeader('Content-Type', 'text/csv');
 
-        if (result.rows.length === 0) {
-            return res.status(404).send('Departamento no encontrado'); 
-        }
-
-        res.status(200).json(result.rows);
+        fastcsv
+            .write(result.rows, { headers: true })
+            .pipe(res);
     } catch (err) {
         console.error(err.message);
-        res.status(500).send('Error al buscar el departamento'); 
+        res.status(500).send('Error al exportar los datos');
     }
 });
 
+
+
+
+//------------------------Departamento
+app.get('/api/departamento', async (req, res) => {
+    try {
+      const result = await client.query('SELECT * FROM buscar_departamento()');
+
+      if (result.rows.length === 0) {
+        return res.status(404).send('No se encontraron departamentos'); 
+      }
+  
+      res.status(200).json(result.rows);
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send('Error al buscar departamentos'); 
+    }
+  });
+  
 
 
 //------------------------Clase
@@ -57,7 +75,7 @@ app.get('/api/clase/departamento/:id_departamento', async (req, res) => {
 
     try {
         const result = await client.query(
-            'SELECT * FROM buscar_clase_por_departamento($1)',
+            'SELECT id FROM buscar_clase_por_departamento($1)',
             [id_departamento]
         );
 
@@ -73,19 +91,18 @@ app.get('/api/clase/departamento/:id_departamento', async (req, res) => {
 });
 
 
-
 //------------------------Familia
-app.get('/api/familia/departamento/:id_departamento', async (req, res) => {
-    const id_departamento = req.params.id_departamento; 
+app.get('/api/familia/clase/:id_clase', async (req, res) => {
+    const id_clase = req.params.id_clase; 
 
     try {
         const result = await client.query(
-            'SELECT * FROM buscar_familia_por_departamento($1)',
-            [id_departamento]
+            'SELECT id FROM buscar_familia_por_departamento($1)',
+            [id_clase]
         );
 
         if (result.rows.length === 0) {
-            return res.status(404).send('No se encontraron familias para este departamento'); 
+            return res.status(404).send('No se encontraron familias para este clase'); 
         }
 
         res.status(200).json(result.rows); 
