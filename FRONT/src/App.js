@@ -276,60 +276,67 @@ function App() {
 
   return (
     <>
-      <div className='img'>
-        <img src={caja} alt="Logo" width={300} height={300}/>
+      <div>
+        <p className='label'>Registro de articulos</p>
       </div>
-      <div className='label'>
-        <Label contenido="Registro de articulos" />
-      </div>
-      <div className='linea'>  
-        <CajaTexto name="sku" value={datos.sku} onChange={actualizarEstado} onBlur={() => obtenerArticuloPorSku(datos.sku)} disabled={false} longitud={6}/>
-        <Label contenido="Sku"/>
-        <div className='linea-check'>
-          <CheckBox checked={datos.descontinuado === 1} onChange={handleDescontinuadoChange} disabled={camposDeshabilitados}/>
-          <Label contenido="Descontinuado"/> 
-        </div>
-      </div>
-      <div className='linea'>  
-        <CajaTexto name="articulo" value={datos.articulo} onChange={actualizarEstado} disabled={camposDeshabilitados} longitud={15}/>
-        <Label contenido="Articulo"/>  
-      </div>
-      <div className='linea'>
-        <CajaTexto name="marcha" value={datos.marcha} onChange={actualizarEstado} disabled={camposDeshabilitados} longitud={15}/>
-        <Label contenido="Marca"/>  
-      </div>
-      <div className='linea'>
-        <CajaTexto name="modelo" value={datos.modelo} onChange={actualizarEstado} disabled={camposDeshabilitados} longitud={20}/>
-        <Label contenido="Modelo"/>  
-      </div>
-      <div className='linea'>
-        <Contenedor opciones={departamentos} disabled={camposDeshabilitados} value={datos.departamento} onSelect={(id) => {setDatos({...datos, departamento: id}); obtenerClasesPorDepartamento(id)}}/>
-        <Label contenido="Departamento"/>  
-        <Contenedor opciones={clases} disabled={camposDeshabilitados} value={datos.clase} onSelect={(id) => {setDatos({...datos, clase: id}); obtenerFamiliasPorDepartamento(id)}}/>
-        <Label contenido="Clase"/>  
-        <Contenedor opciones={familias} disabled={camposDeshabilitados} value={datos.familia} onSelect={(id) => setDatos({...datos, familia: id})}/> 
-        <Label contenido="Familia"/>  
-      </div>
-      <div className='linea'>
+      <div className='general'>
         <div>
-          <Label contenido="Stock"/>  
-          <CajaTexto name="stock" value={datos.stock} disabled={camposDeshabilitados} onChange={actualizarEstado} longitud={9}/>
+          <div className='linea'>  
+            <Label contenido="Sku"/>
+            <CajaTexto name="sku" value={datos.sku} onChange={actualizarEstado} onBlur={() => obtenerArticuloPorSku(datos.sku)} disabled={false} longitud={6}/>
+            <div className='linea-check'>
+              <CheckBox checked={datos.descontinuado === 1} onChange={handleDescontinuadoChange} disabled={camposDeshabilitados}/>
+              <Label contenido="Descontinuado"/> 
+            </div>
+          </div>
+          <div className='linea'>  
+            <Label contenido="Articulo"/> 
+            <CajaTexto name="articulo" value={datos.articulo} onChange={actualizarEstado} disabled={camposDeshabilitados} longitud={15}/>       
+          </div>
+          <div className='linea'>
+            <Label contenido="Marca"/>  
+            <CajaTexto name="marcha" value={datos.marcha} onChange={actualizarEstado} disabled={camposDeshabilitados} longitud={15}/>
+          </div>
+          <div className='linea'>
+            <Label contenido="Modelo"/>  
+            <CajaTexto name="modelo" value={datos.modelo} onChange={actualizarEstado} disabled={camposDeshabilitados} longitud={20}/>
+          </div>
+        </div>       
+
+        <div className='lineaSelect'>
+          <Label contenido="Departamento"/>  
+          <Contenedor opciones={departamentos} disabled={camposDeshabilitados} value={datos.departamento} onSelect={(id) => {setDatos({...datos, departamento: id}); obtenerClasesPorDepartamento(id)}}/>
+          <Label contenido="Clase"/>  
+          <Contenedor opciones={clases} disabled={camposDeshabilitados} value={datos.clase} onSelect={(id) => {setDatos({...datos, clase: id}); obtenerFamiliasPorDepartamento(id)}}/>
+          <Label contenido="Familia"/> 
+          <Contenedor opciones={familias} disabled={camposDeshabilitados} value={datos.familia} onSelect={(id) => setDatos({...datos, familia: id})}/>   
         </div>
-        <div className='fechas'>
-          <Label contenido="Cantidad"/>  
-          <CajaTexto name="cantidad" value={datos.cantidad} disabled={camposDeshabilitados} onChange={actualizarEstado} longitud={9}/>
-        </div>   
-      </div>
-      <div className='linea'>
+
         <div>
-          <Label contenido="Fecha Alta"/>  
-          <CajaFecha name="fechaalta" value={datos.fechaalta} onChange={actualizarEstado} disabled={true}/>
+          <div className='linea2'>
+            <div>
+              <Label contenido="Stock"/>  
+              <CajaTexto name="stock" value={datos.stock} disabled={camposDeshabilitados} onChange={actualizarEstado} longitud={9}/>
+            </div>
+            <div className='fechas'>
+              <Label contenido="Cantidad"/>  
+              <CajaTexto name="cantidad" value={datos.cantidad} disabled={camposDeshabilitados} onChange={actualizarEstado} longitud={9}/>
+            </div>   
+          </div>
+          <div className='linea2'>
+            <div>
+              <Label contenido="Fecha Alta"/>  
+              <CajaFecha name="fechaalta" value={datos.fechaalta} onChange={actualizarEstado} disabled={true}/>
+            </div>
+            <div className='fechas'>
+              <Label contenido="Fecha Baja"/>  
+              <CajaFecha name="fechabaja" value={datos.fechabaja} onChange={actualizarEstado} disabled={true}/>
+            </div>
+          </div>
         </div>
-        <div className='fechas'>
-          <Label contenido="Fecha Baja"/>  
-          <CajaFecha name="fechabaja" value={datos.fechabaja} onChange={actualizarEstado} disabled={true}/>
-        </div>
+       
       </div>
+      
       <div className='linea-botones'>
         <Botones contenido="Agregar" onClick={agregar} disabled={camposDeshabilitados}/>
         <Botones contenido="Modificar" onClick={modificar} disabled={camposDeshabilitados}/>
