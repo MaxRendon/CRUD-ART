@@ -1,4 +1,12 @@
-.caja {
-    font-size: 30px;
-    margin-top: 8px;
+.cajat {
+    width: 600px; 
+    height: 30px; 
+    font-size: 18px; 
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 5px; 
+    margin-left: 0%;
+    position: relative;
+    /* position: absolute; */
+    /* margin-left: 400px; */
 }
