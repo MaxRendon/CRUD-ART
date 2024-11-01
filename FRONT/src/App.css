@@ -1,18 +1,35 @@
 body {
-  background-color: white;
+  background-color: #dafff4;
 }
 
 div {
-  background-color: #f7f7f7;
+  background-color: #c1ffec;
   margin-top: 25px  ;
 }
 
+.fechas {
+  margin-left: 5%;
+  flex-direction: row;
+}
+
+.img {
+  position: absolute;
+  margin-left: 6%;
+  margin-top: 8%;
+}
+
+.label {
+  position: absolute;
+  margin-top: 25%;
+  margin-left: 4%;
+}
 
 .linea {
   display: flex;
   flex-direction: row;
   gap: 10px;
   align-items: center;
+  margin-left: 30%;
 }
 
 .linea-botones{
@@ -21,7 +38,7 @@ div {
   gap: 10px;
   align-items: center;
   text-align: right;
-  margin-left: 60px;
+  margin-left: 40%;
   margin-right: 0px;
 }
 
@@ -34,4 +51,8 @@ div {
   margin-left: 400px;
   margin-top: 0px;
   text-align: right;
+  position: absolute;
+  top: 25px;
+  left: 60%;
 }
+

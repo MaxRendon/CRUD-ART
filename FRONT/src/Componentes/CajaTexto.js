@@ -4,7 +4,7 @@ import './CajaTexto.css'
 function CajaTexto({ name, value, onChange, onBlur, disabled, longitud }) {
     return (
         <input 
-            className='caja'
+            className='cajat'
             type="text"
             name={name}
             value={value}
