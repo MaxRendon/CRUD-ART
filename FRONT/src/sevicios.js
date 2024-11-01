@@ -3,6 +3,7 @@
 import axios from 'axios';
 
 export const crearArticulo = async (formData) => {
+    console.log('Fecha', formData)
     try {
         const response = await axios.post('http://localhost:3000/api/articulo', formData, {
             headers: {

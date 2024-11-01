@@ -1,11 +1,13 @@
 const express = require('express');
 const { Client } = require('pg');
 const cors = require('cors');
+const helmet = require('helmet');
 require('dotenv').config();
 
 const app = express();
 app.use(express.json());
 app.use(cors());
+app.use(helmet());
 const PORT = process.env.PORT || 3000;
 
 const client = new Client({
@@ -141,12 +143,14 @@ app.post('/api/articulo', async (req, res) => {
         departamento,
         clase,
         familia,
-        fecha_alta,
+        fechaalta,
         stock,
         cantidad,
         descontinuado,
-        fecha_baja
+        fechabaja
     } = req.body; 
+
+    console.log('Datos recibidos en el backend:', req.body);
 
     try {
         await client.query('CALL crear_articulo($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)', [
@@ -157,11 +161,11 @@ app.post('/api/articulo', async (req, res) => {
             departamento,
             clase,
             familia,
-            fecha_alta,
+            fechaalta,
             stock,
             cantidad,
             descontinuado,
-            fecha_baja
+            fechabaja
         ]);
 
         res.status(201).json({ message: 'Artículo creado', data: req.body });
@@ -174,12 +178,12 @@ app.post('/api/articulo', async (req, res) => {
 //--actualizar
 app.put('/api/articulo/:sku', async (req, res) => {
     const sku = parseInt(req.params.sku); 
-    const { articulo, marcha, modelo, departamento, clase, familia, fecha_alta, stock, cantidad, descontinuado, fecha_baja } = req.body;
+    const { articulo, marcha, modelo, departamento, clase, familia, fechaalta, stock, cantidad, descontinuado, fechabaja } = req.body;
 
     try {
         await client.query(
             'CALL actualizar_articulo($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)',
-            [sku, articulo, marcha, modelo, departamento, clase, familia, fecha_alta, stock, cantidad, descontinuado, fecha_baja]
+            [sku, articulo, marcha, modelo, departamento, clase, familia, fechaalta, stock, cantidad, descontinuado, fechabaja]
         );
         res.status(200).send('Artículo actualizado'); 
     } catch (err) {

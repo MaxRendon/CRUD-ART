@@ -1,7 +1,7 @@
 import React from 'react'
 import './CajaTexto.css'
 
-function CajaTexto({ name, value, onChange, onBlur, disabled }) {
+function CajaTexto({ name, value, onChange, onBlur, disabled, longitud }) {
     return (
         <input 
             className='caja'
@@ -11,6 +11,7 @@ function CajaTexto({ name, value, onChange, onBlur, disabled }) {
             onChange={onChange}
             onBlur={onBlur}
             disabled={disabled}
+            maxLength={longitud}
         />
     );
 }
