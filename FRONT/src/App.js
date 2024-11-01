@@ -25,11 +25,11 @@ function App() {
       departamento: '',
       clase: '',
       familia: '',
-      fecha_alta: obtenerFechaActual(),
+      fechaalta: obtenerFechaActual(),
       stock: '',
       cantidad: '',
       descontinuado: 0,
-      fecha_baja: '1900-01-01'
+      fechabaja: '1900-01-01'
   });
 
 
@@ -42,14 +42,21 @@ function App() {
   const actualizarEstado = (e) => {
     const { name, value, type, checked } = e.target;
 
-    // const camposNumericos = ['sku', 'stock', 'cantidad'];
-    // if (camposNumericos.includes(name) && isNaN(value)) {
-    //   alert(`El campo ${name} solo puede contener números.`);
-    //   return;
-    // }
+    
+    if (name === 'cantidad' || name === 'stock') {
+      if (!/^\d*$/.test(value)) {
+          alert(`El campo ${name} solo puede contener números.`);
+          return; 
+      }
+  }
     
     if (name === 'cantidad' && parseInt(value) > parseInt(datos.stock)) {
       alert("La cantidad no puede ser mayor que el stock.");
+      return; 
+    }
+
+    if (name === 'stock' && parseInt(value) < parseInt(datos.cantidad)) {
+      alert("El stock no puede ser menor que la cantidad.");
       return; 
     }
 
@@ -71,32 +78,57 @@ function App() {
     setDatos((prevDatos) => ({
         ...prevDatos,
         descontinuado: checked ? 1 : 0,
-        fecha_baja: checked ? obtenerFechaActual() : '1900-01-01'
+        fechabaja: checked ? obtenerFechaActual() : '1900-01-01'
     }));
   };
+
+  const formatearFecha = (fecha) => {
+    if (!fecha) return '';
+    const nuevaFecha = new Date(fecha);
+    const año = nuevaFecha.getFullYear();
+    const mes = (nuevaFecha.getMonth() + 1).toString().padStart(2, '0'); // Los meses empiezan desde 0
+    const dia = nuevaFecha.getDate().toString().padStart(2, '0');
+    return `${año}-${mes}-${dia}`; // Formato "yyyy-MM-dd"
+  };
+
 
   const obtenerArticuloPorSku = async (sku) => {
     try {
         const response = await axios.get(`http://localhost:3000/api/articulo/${sku}`);
         const articulo = response.data;
-        const fecha_alta = articulo.fecha_alta ? articulo.fecha_alta.split('T')[0] : '';
-        const fecha_baja = articulo.fecha_baja ? articulo.fecha_baja.split('T')[0] : '';
-        
+        const fechaalta = articulo.fechaalta ? formatearFecha(articulo.fechaalta) : '';
+        const fechabaja = articulo.fechabaja ? formatearFecha(articulo.fechabaja) : '';
+
+        console.log('Clase:', articulo.clase);
+        console.log('Familia:', articulo.familia);
 
         setDatos({
             ...articulo,
-            fecha_alta: obtenerFechaActual(),
-            fecha_baja: '1900-01-01'
+            fechaalta,
+            fechabaja
         });
+        
 
         setCamposDeshabilitados(false);
 
-        console.log("Fecha alta antes de asignar:", fecha_alta);
-        console.log("Fecha baja antes de asignar:", fecha_baja);
     } catch (error) {
         console.error("Error al consultar el artículo por SKU:", error);
         alert("Artículo no encontrado o error al consultar.");
         setCamposDeshabilitados(false);
+        setDatos({
+          sku: sku,
+          articulo: '',
+          marcha: '',
+          modelo: '',
+          departamento: '',
+          clase: '',
+          familia: '',
+          fechaalta: obtenerFechaActual(),
+          stock: '',
+          cantidad: '',
+          descontinuado: 0,
+          fechabaja: '1900-01-01'
+        });
     }
   };
 
@@ -105,10 +137,10 @@ function App() {
   
     const datosAEnviar = {
       ...datos,
-      fecha_alta: datos.fecha_alta === '' ? null : datos.fecha_alta,
-      fecha_baja: datos.fecha_baja === '' ? null : datos.fecha_baja
+      fechaalta: datos.fechaalta === '' ? null : datos.fechaalta,
+      fechabaja: datos.fechabaja === '' ? null : datos.fechabaja
     };
-  
+
     try {
       const response = await axios.put(`http://localhost:3000/api/articulo/${datos.sku}`, datosAEnviar);
       alert("Artículo actualizado exitosamente.");
@@ -143,11 +175,11 @@ function App() {
         departamento: '',
         clase: '',
         familia: '',
-        fecha_alta: '',
+        fechaalta: '',
         stock: '',
         cantidad: '',
         descontinuado: 0,
-        fecha_baja: ''
+        fechabaja: ''
       });
       setCamposDeshabilitados(false);
     } catch (error) {
@@ -158,15 +190,17 @@ function App() {
   
 
   const agregar = async () => {
-    console.log('Datos enviados:', datos);
+    if (!datos.sku) {
+      return alert('El SKU es obligatorio.'); 
+    }
 
     const datosAEnviar = {
       ...datos,
-      fecha_alta: datos.fecha_alta === '' ? null : datos.fecha_alta,
-      fecha_baja: datos.fecha_baja === '' ? null : datos.fecha_baja
+      fechaalta: datos.fechaalta === '' ? null : datos.fechaalta,
+      fechabaja: datos.fechabaja === '' ? null : datos.fechabaja
   };
 
-    try {
+  try {
       const response = await crearArticulo(datosAEnviar);
       if (response.success) {
         alert("Artículo creado exitosamente.");
@@ -243,7 +277,7 @@ function App() {
     <>
       <div className='linea'>
         <Label contenido="Sku"/>  
-        <CajaTexto name="sku" value={datos.sku} onChange={actualizarEstado} onBlur={() => obtenerArticuloPorSku(datos.sku)} disabled={false}/>
+        <CajaTexto name="sku" value={datos.sku} onChange={actualizarEstado} onBlur={() => obtenerArticuloPorSku(datos.sku)} disabled={false} longitud={6}/>
         <div className='linea-check'>
           <CheckBox checked={datos.descontinuado === 1} onChange={handleDescontinuadoChange} disabled={camposDeshabilitados}/>
           <Label contenido="Descontinuado"/> 
@@ -251,15 +285,15 @@ function App() {
       </div>
       <div className='linea'>
         <Label contenido="Articulo"/>  
-        <CajaTexto name="articulo" value={datos.articulo} onChange={actualizarEstado} disabled={camposDeshabilitados}/>
+        <CajaTexto name="articulo" value={datos.articulo} onChange={actualizarEstado} disabled={camposDeshabilitados} longitud={15}/>
       </div>
       <div className='linea'>
         <Label contenido="Marca"/>  
-        <CajaTexto name="marcha" value={datos.marcha} onChange={actualizarEstado} disabled={camposDeshabilitados}/>
+        <CajaTexto name="marcha" value={datos.marcha} onChange={actualizarEstado} disabled={camposDeshabilitados} longitud={15}/>
       </div>
       <div className='linea'>
         <Label contenido="Modelo"/>  
-        <CajaTexto name="modelo" value={datos.modelo} onChange={actualizarEstado} disabled={camposDeshabilitados}/>
+        <CajaTexto name="modelo" value={datos.modelo} onChange={actualizarEstado} disabled={camposDeshabilitados} longitud={20}/>
       </div>
       <div className='linea'>
         <Label contenido="Departamento"/>  
@@ -275,15 +309,15 @@ function App() {
       </div>
       <div className='linea'>
         <Label contenido="Stock"/>  
-        <CajaTexto name="stock" value={datos.stock} disabled={camposDeshabilitados} onChange={actualizarEstado}/>
+        <CajaTexto name="stock" value={datos.stock} disabled={camposDeshabilitados} onChange={actualizarEstado} longitud={9}/>
         <Label contenido="Cantidad"/>  
-        <CajaTexto name="cantidad" value={datos.cantidad} disabled={camposDeshabilitados} onChange={actualizarEstado}/>
+        <CajaTexto name="cantidad" value={datos.cantidad} disabled={camposDeshabilitados} onChange={actualizarEstado} longitud={9}/>
       </div>
       <div className='linea'>
         <Label contenido="Fecha Alta"/>  
-        <CajaFecha name="fecha_alta" value={datos.fecha_alta} onChange={actualizarEstado} disabled={true}/>
+        <CajaFecha name="fechaalta" value={datos.fechaalta} onChange={actualizarEstado} disabled={true}/>
         <Label contenido="Fecha Baja"/>  
-        <CajaFecha name="fecha_baja" value={datos.fecha_baja} onChange={actualizarEstado} disabled={true}/>
+        <CajaFecha name="fechabaja" value={datos.fechabaja} onChange={actualizarEstado} disabled={true}/>
       </div>
       <div className='linea-botones'>
         <Botones contenido="Agregar" onClick={agregar} disabled={camposDeshabilitados}/>
